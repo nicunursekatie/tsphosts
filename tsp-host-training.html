@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSP Host Training | The Sandwich Project</title>
+    <style>
+        :root {
+            --dark-teal: #236383;
+            --orange: #fbad3f;
+            --teal: #007e8c;
+            --light-teal: #47b3cb;
+            --burgundy: #a31c41;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--light-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--dark-teal);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--orange);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            height: 8px;
+            width: 200px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--orange);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            margin-left: 1rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 70px);
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--dark-teal) 0%, var(--teal) 100%);
+            color: white;
+        }
+
+        .welcome-screen h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-screen p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .welcome-screen .tagline {
+            color: var(--orange);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-preview {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .module-chip {
+            background: rgba(255,255,255,0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: var(--orange);
+            color: var(--dark-teal);
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--dark-teal);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .slide-container.active {
+            display: block;
+        }
+
+        /* Module Header */
+        .module-header {
+            background: var(--dark-teal);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            margin-bottom: 0;
+        }
+
+        .module-number {
+            color: var(--orange);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .module-header h2 {
+            font-size: 1.75rem;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .content-card.standalone {
+            border-radius: 12px;
+        }
+
+        .content-card h3 {
+            color: var(--dark-teal);
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-card h4 {
+            color: var(--teal);
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .content-card p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content-card ul, .content-card ol {
+            margin: 1rem 0 1rem 1.5rem;
+        }
+
+        .content-card li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Key Takeaway Box */
+        .key-takeaway {
+            background: linear-gradient(135deg, var(--orange) 0%, #f59e0b 100%);
+            color: var(--dark-teal);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .key-takeaway-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-takeaway p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Critical Warning Box */
+        .critical-warning {
+            background: var(--burgundy);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .critical-warning-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .critical-warning p {
+            margin: 0;
+            color: white;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: var(--light-teal);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: white;
+        }
+
+        /* Do/Don't Columns */
+        .do-dont-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .do-column, .dont-column {
+            padding: 1.25rem;
+            border-radius: 8px;
+        }
+
+        .do-column {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .dont-column {
+            background: #ffebee;
+            border-left: 4px solid var(--burgundy);
+        }
+
+        .do-column h4, .dont-column h4 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1rem;
+        }
+
+        .do-column h4 {
+            color: #2e7d32;
+        }
+
+        .dont-column h4 {
+            color: var(--burgundy);
+        }
+
+        .do-column ul, .dont-column ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .do-column li, .dont-column li {
+            font-size: 0.95rem;
+        }
+
+        /* Steps */
+        .steps-container {
+            margin: 1.5rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background: var(--orange);
+            color: var(--dark-teal);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content strong {
+            color: var(--dark-teal);
+        }
+
+        /* Cold Chain Visual */
+        .cold-chain-visual {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: var(--light-bg);
+            border-radius: 8px;
+        }
+
+        .chain-step {
+            background: white;
+            border: 2px solid var(--light-teal);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .chain-step::after {
+            content: '→';
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .chain-step:last-child::after {
+            display: none;
+        }
+
+        /* Temperature Display */
+        .temp-display {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .temp-card {
+            flex: 1;
+            padding: 1.25rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .temp-card.safe {
+            background: #e3f2fd;
+            border: 2px solid var(--light-teal);
+        }
+
+        .temp-card.danger {
+            background: #ffebee;
+            border: 2px solid var(--burgundy);
+        }
+
+        .temp-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .temp-card.safe .temp-value {
+            color: var(--teal);
+        }
+
+        .temp-card.danger .temp-value {
+            color: var(--burgundy);
+        }
+
+        .temp-label {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--teal);
+        }
+
+        .quiz-header {
+            color: var(--teal);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--dark-teal);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .quiz-option:hover:not(.disabled) {
+            border-color: var(--light-teal);
+            background: #f5f5f5;
+        }
+
+        .quiz-option.selected {
+            border-color: var(--teal);
+            background: #e0f7fa;
+        }
+
+        .quiz-option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--burgundy);
+            background: #ffebee;
+        }
+
+        .quiz-option.disabled {
+            cursor: default;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .nav-buttons .btn {
+            min-width: 120px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Completion Screen */
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--dark-teal) 0%, var(--teal) 100%);
+            color: white;
+            min-height: calc(100vh - 70px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .completion-screen.active {
+            display: flex;
+        }
+
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-screen p {
+            max-width: 500px;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .completion-checklist {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .completion-checklist h4 {
+            margin-bottom: 1rem;
+            color: var(--orange);
+        }
+
+        .completion-checklist li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            bottom: 0;
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 1rem 0;
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+
+        .sidebar-nav.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            left: 1rem;
+            bottom: 1rem;
+            background: var(--dark-teal);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 60;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-section {
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--light-bg);
+        }
+
+        .nav-item.active {
+            background: var(--light-teal);
+            color: white;
+        }
+
+        .nav-item.completed {
+            color: var(--teal);
+        }
+
+        .nav-item.completed::before {
+            content: '✓ ';
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .progress-container {
+                width: 100px;
+            }
+
+            .welcome-screen h1 {
+                font-size: 1.75rem;
+            }
+
+            .module-preview {
+                display: none;
+            }
+
+            .do-dont-container {
+                grid-template-columns: 1fr;
+            }
+
+            .temp-display {
+                flex-direction: column;
+            }
+
+            .cold-chain-visual {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .chain-step::after {
+                content: '↓';
+                right: auto;
+                bottom: -18px;
+                top: auto;
+                transform: translateX(-50%);
+                left: 50%;
+            }
+
+            .slide-container {
+                padding: 1rem;
+            }
+
+            .content-card, .module-header {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-container.active {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Checklist Style */
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .checklist li {
+            padding: 0.5rem 0 0.5rem 2rem;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: var(--teal);
+            font-size: 1.1rem;
+        }
+
+        /* Table Style */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .info-table th, .info-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-table th {
+            background: var(--light-bg);
+            color: var(--dark-teal);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">THE <span>SANDWICH</span> PROJECT</div>
+        <div style="display: flex; align-items: center;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <span class="progress-text" id="progressText">0%</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>TSP Host Training</h1>
+            <p class="tagline">Nourish the Hungry, Feed the Soul</p>
+            <p>Welcome to The Sandwich Project host training! This interactive guide will walk you through everything you need to know to be an amazing host.</p>
+            <div class="module-preview">
+                <span class="module-chip">📋 Getting Started</span>
+                <span class="module-chip">🧊 Food Safety</span>
+                <span class="module-chip">📅 Operations</span>
+                <span class="module-chip">📞 Resources</span>
+            </div>
+            <p style="font-size: 1rem; opacity: 0.8;">About 20-30 minutes to complete</p>
+            <button class="btn" onclick="startTraining()">Let's Get Started</button>
+        </div>
+
+        <!-- MODULE 1: GETTING STARTED -->
+        <div class="slide-container" id="slide-1-1">
+            <div class="module-header">
+                <div class="module-number">Module 1 of 4</div>
+                <h2>Getting Started</h2>
+            </div>
+            <div class="content-card">
+                <h3>Welcome to The Sandwich Project Team! 👋</h3>
+                <p>Thank you for opening your home to support The Sandwich Project. You play a critical role in helping us safely deliver fresh food to those in need.</p>
+
+                <h4>Who We Serve</h4>
+                <ul>
+                    <li>Children, seniors, and people with health vulnerabilities</li>
+                    <li>Low-income individuals and families</li>
+                    <li>Veterans</li>
+                    <li>Anyone experiencing food insecurity</li>
+                </ul>
+
+                <div class="info-box">
+                    <p><strong>You're Not Alone!</strong> You'll be assigned to a team with a lead host who can answer your questions. The TSP team will support you throughout the process.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="goToWelcome()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-1-2">
+            <div class="module-header">
+                <div class="module-number">Module 1 of 4</div>
+                <h2>The Important Role of a TSP Host</h2>
+            </div>
+            <div class="content-card">
+                <p>As a local collection site, <strong>you are the face of The Sandwich Project</strong>. You provide convenient drop-off locations and act as the vital connection between individual sandwich makers and the coordinated delivery of thousands of sandwiches.</p>
+
+                <h4>What You'll Experience</h4>
+                <ul>
+                    <li><strong>Make a Real Difference</strong> — Volunteering enhances your well-being while helping your community</li>
+                    <li><strong>Build Relationships</strong> — Many hosts develop long-term connections with regular volunteers</li>
+                    <li><strong>Expand Your Network</strong> — Meet people of all ages who share your passion for helping others</li>
+                </ul>
+
+                <div class="key-takeaway">
+                    <div class="key-takeaway-label">💡 Key Point</div>
+                    <p>Being friendly and approachable helps grow participation and strengthens community connections.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-1-3">
+            <div class="module-header">
+                <div class="module-number">Module 1 of 4</div>
+                <h2>Host Requirements</h2>
+            </div>
+            <div class="content-card">
+                <h4>1. Set Up Your Collection Area</h4>
+                <p>Choose a collection location (garage or front door) accessible to volunteers on Wednesdays. You'll need:</p>
+                <ul>
+                    <li>A designated bin or area for fruit/snacks</li>
+                    <li>A TSP yard sign</li>
+                    <li>Sign-in sheets and sandwich labels</li>
+                    <li>A small table or clipboard</li>
+                </ul>
+
+                <h4>2. Spare Refrigerator Space</h4>
+                <p>You should have an <strong>extra refrigerator</strong> to dedicate to TSP use. Ensure it's clean before collection day. TSP team members will discuss providing a TSP-owned refrigerator.</p>
+
+                <h4>3. Availability on Wednesdays and Thursdays</h4>
+                <ul>
+                    <li><strong>Wednesdays</strong> — Collection day</li>
+                    <li><strong>Thursdays</strong> — Delivery day (you'll drive donations to a central location or recipient organization)</li>
+                </ul>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-1-4">
+            <div class="module-header">
+                <div class="module-number">Module 1 of 4</div>
+                <h2>Host Safety Responsibilities</h2>
+            </div>
+            <div class="content-card">
+                <div class="do-dont-container">
+                    <div class="do-column">
+                        <h4>✓ Hosts DO</h4>
+                        <ul>
+                            <li>Provide refrigerator space and refrigerate sandwiches immediately</li>
+                            <li>Ensure sandwiches remain at or below 40°F</li>
+                            <li>Receive and inspect sandwiches (sealed, labeled, cold to touch)</li>
+                            <li>Coordinate sandwich transport</li>
+                            <li>Contact your lead host if anything is unclear</li>
+                        </ul>
+                    </div>
+                    <div class="dont-column">
+                        <h4>✗ Hosts DO NOT</h4>
+                        <ul>
+                            <li>Open sealed sandwich bags</li>
+                            <li>Accept sandwiches that feel warm or appear unsafe</li>
+                            <li>Overfill refrigerators (airflow is essential!)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Important</div>
+                    <p>Never open sealed sandwich bags. This maintains hygiene and prevents cross-contamination.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-1-5">
+            <div class="module-header">
+                <div class="module-number">Module 1 of 4</div>
+                <h2>Wednesday: Collection Day Process</h2>
+            </div>
+            <div class="content-card">
+                <h4>Setup Checklist</h4>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content"><strong>Put Out Donation Bin</strong> — Place in an accessible location for fruit/snacks</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content"><strong>Prepare Sign-In Station</strong> — Place sign-in sheets, both deli & PB&J labels, and pens near drop-off</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content"><strong>Display Volunteer Instructions</strong> — Post clearly where volunteers can see them</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content"><strong>Place TSP Yard Sign</strong> — Position prominently for easy identification</div>
+                    </div>
+                </div>
+
+                <h4>When Volunteers Arrive</h4>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content"><strong>Greet volunteers</strong> at your sign-in station when possible</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content"><strong>Volunteers label sandwiches</strong> using your provided labels</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content"><strong>Verify labels</strong> — Check all sandwiches are correctly labeled</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content"><strong>Volunteers sign in</strong> — Record sandwich counts and contact info</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content"><strong>Refrigerate immediately</strong> — Place sandwiches with enough room for airflow</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module 1 Quiz -->
+        <div class="slide-container" id="slide-1-quiz">
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 1</div>
+                <div class="quiz-question">What should you do if a volunteer brings sandwiches that feel warm to the touch?</div>
+                <div class="quiz-options" id="quiz1">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz1', false)">Accept them and put them in the refrigerator immediately</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz1', false)">Accept them but mark them as "use first"</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz1', true)">Politely refuse them — hosts do not accept warm sandwiches</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz1', false)">Put them in the freezer to cool down quickly</div>
+                </div>
+                <div class="quiz-feedback" id="quiz1-feedback"></div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 1</div>
+                <div class="quiz-question">On which days do hosts need to be available?</div>
+                <div class="quiz-options" id="quiz2">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Monday and Tuesday</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', true)">Wednesday (collection) and Thursday (delivery)</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Any two days that work for your schedule</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Friday and Saturday</div>
+                </div>
+                <div class="quiz-feedback" id="quiz2-feedback"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                <button class="btn" onclick="nextSlide()">Continue to Food Safety →</button>
+            </div>
+        </div>
+
+        <!-- MODULE 2: FOOD SAFETY -->
+        <div class="slide-container" id="slide-2-1">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>Food Safety Foundations</h2>
+            </div>
+            <div class="content-card">
+                <h3>Why Food Safety Matters</h3>
+                <p>At The Sandwich Project, we serve many individuals who are <strong>more susceptible to foodborne illness</strong>:</p>
+                <ul>
+                    <li>Children and seniors</li>
+                    <li>People with chronic health conditions or weakened immune systems</li>
+                    <li>Many may not have health insurance or easy access to healthcare</li>
+                </ul>
+
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Critical</div>
+                    <p>Food safety depends on strict consistency at every step. There are no shortcuts.</p>
+                </div>
+
+                <h4>Three Pillars of Food Safety</h4>
+                <div class="temp-display" style="margin-top: 1rem;">
+                    <div class="temp-card safe" style="background: #e0f7fa;">
+                        <div class="temp-value" style="font-size: 1.5rem;">🌡️</div>
+                        <div class="temp-label"><strong>Temperature</strong><br>Keep it cold — maintain the cold chain</div>
+                    </div>
+                    <div class="temp-card safe" style="background: #e8f5e9;">
+                        <div class="temp-value" style="font-size: 1.5rem;">🧼</div>
+                        <div class="temp-label"><strong>Hygiene</strong><br>Keep it clean — surfaces, hands, equipment</div>
+                    </div>
+                    <div class="temp-card safe" style="background: #fff3e0;">
+                        <div class="temp-value" style="font-size: 1.5rem;">✨</div>
+                        <div class="temp-label"><strong>Quality</strong><br>Keep it neat — proper assembly matters</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-2-2">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>The Cold Chain</h2>
+            </div>
+            <div class="content-card">
+                <p>The <strong>"cold chain"</strong> means keeping perishable food consistently cold from the moment it's purchased until it's delivered to recipients.</p>
+
+                <div class="cold-chain-visual">
+                    <div class="chain-step">🛒 Store purchase</div>
+                    <div class="chain-step">🧊 Car with cooler</div>
+                    <div class="chain-step">🏠 Volunteer's fridge</div>
+                    <div class="chain-step">🥪 Quick assembly</div>
+                    <div class="chain-step">❄️ Back to fridge</div>
+                    <div class="chain-step">🧊 Cooler in car</div>
+                    <div class="chain-step">🏠 Host's fridge</div>
+                    <div class="chain-step">🚗 Driver's cooler</div>
+                    <div class="chain-step">✅ Recipient's fridge</div>
+                </div>
+
+                <div class="key-takeaway">
+                    <div class="key-takeaway-label">💡 Key Point</div>
+                    <p>At every stage, minimize or eliminate breaks in the cold chain. Keep time outside refrigeration as short as possible.</p>
+                </div>
+
+                <h4>Absolute Temperature Limits</h4>
+                <div class="temp-display">
+                    <div class="temp-card safe">
+                        <div class="temp-value">40°F</div>
+                        <div class="temp-label"><strong>Maximum Safe Temp</strong><br>Above this, bacteria begin to grow</div>
+                    </div>
+                    <div class="temp-card danger">
+                        <div class="temp-value">80°F</div>
+                        <div class="temp-label"><strong>Danger Zone</strong><br>Bacterial growth accelerates rapidly — food is unsafe</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-2-3">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>The Two-Hour Rule ⏱️</h2>
+            </div>
+            <div class="content-card">
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Critical Rule</div>
+                    <p>Deli meat and cheese may only be above 40°F for a <strong>total of two hours, cumulatively</strong>.</p>
+                </div>
+
+                <h4>This Is NOT "Two Hours at a Time"</h4>
+                <p>It's two hours <strong>TOTAL</strong>, added up across the entire process. This includes all time the food is not refrigerated:</p>
+                <ul>
+                    <li>At the grocery store</li>
+                    <li>During sandwich assembly</li>
+                    <li>During transfer to and from coolers</li>
+                    <li>Any time from the true source until volunteers picked it off the shelf</li>
+                </ul>
+
+                <h4>Why This Matters</h4>
+                <ul>
+                    <li>As an organization, TSP is subject to food safety laws</li>
+                    <li>Our recipients are more vulnerable than the average population</li>
+                    <li><strong>Recooling does not kill bacteria that have already grown</strong></li>
+                </ul>
+
+                <div class="key-takeaway">
+                    <div class="key-takeaway-label">💡 Key Point</div>
+                    <p>Two hours may sound like plenty, but it adds up fast. That's why we're strict at every step.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-2-4">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>Refrigeration Standards</h2>
+            </div>
+            <div class="content-card">
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content"><strong>Temperature Range</strong> — Refrigerators must maintain <strong>34–38°F</strong> consistently</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content"><strong>Air Circulation</strong> — Food items must not be packed tightly. Adequate airflow is essential.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content"><strong>Never Overfill</strong> — Overfilled refrigerators create warm spots, compromising safety</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content"><strong>Door Discipline</strong> — Keep doors closed as much as possible</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content"><strong>Dedicated & Clean</strong> — The TSP refrigerator should be used <em>only</em> for TSP sandwiches</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>Pro Tip:</strong> Freezers are great for getting sandwiches down to safe temperatures quickly before going into coolers for transport.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-2-5">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>Coolers & Transport</h2>
+            </div>
+            <div class="content-card">
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Important Distinction</div>
+                    <p><strong>Coolers are NOT refrigerators.</strong> They maintain cold food — they do not cool warm food.</p>
+                </div>
+
+                <p>Coolers work through <strong>insulation</strong>, creating a barrier that slows heat transfer. They lack the circulation or active cooling to actually lower temperature.</p>
+
+                <div class="do-dont-container">
+                    <div class="do-column">
+                        <h4>✓ Coolers Work For</h4>
+                        <ul>
+                            <li>Getting ingredients home from the store</li>
+                            <li>Transporting pre-chilled sandwiches with ice packs</li>
+                            <li>Maintaining safe temps for 2-4 hours during active transport</li>
+                        </ul>
+                    </div>
+                    <div class="dont-column">
+                        <h4>✗ Coolers Do NOT Work For</h4>
+                        <ul>
+                            <li>Bringing warm food temperature down</li>
+                            <li>Storing cold food for long periods</li>
+                            <li>Making warm food safe again after the 2-hour rule is broken</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>Maximizing Cooler Performance</h4>
+                <ul>
+                    <li><strong>Ice packs everywhere</strong> — Place between layers and on top of sandwiches</li>
+                    <li><strong>Pack full</strong> — Full coolers with minimal air space stay colder longer</li>
+                    <li><strong>Keep lid closed</strong> — Every opening lets warm air in</li>
+                </ul>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-2-6">
+            <div class="module-header">
+                <div class="module-number">Module 2 of 4</div>
+                <h2>Labels & Time Limits</h2>
+            </div>
+            <div class="content-card">
+                <h4>Label Requirements</h4>
+                <ul>
+                    <li>Use only <strong>TSP-issued labels</strong> (can be printed from the TSP app)</li>
+                    <li>Do not alter labels</li>
+                    <li>Fill out all required information</li>
+                </ul>
+
+                <h4>Time Limits</h4>
+                <div class="temp-display">
+                    <div class="temp-card safe">
+                        <div class="temp-value" style="font-size: 1.5rem;">48 hrs</div>
+                        <div class="temp-label"><strong>Delivery Window</strong><br>Sandwiches must be delivered within 48 hours of being made</div>
+                    </div>
+                    <div class="temp-card" style="background: #fff3e0; border: 2px solid var(--orange);">
+                        <div class="temp-value" style="font-size: 1.5rem; color: var(--orange);">36 hrs</div>
+                        <div class="temp-label"><strong>Consumption Window</strong><br>Must be consumed within 36 hours of date made</div>
+                    </div>
+                </div>
+
+                <h4>Quick Checks When Receiving</h4>
+                <ul>
+                    <li>Each sandwich in an individual bag, returned to original loaf bag</li>
+                    <li>Each loaf bag clearly labeled (PB&J or Deli with meat type)</li>
+                    <li>Bags neatly closed and secure</li>
+                    <li>Tally totals promptly</li>
+                </ul>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module 2 Quiz -->
+        <div class="slide-container" id="slide-2-quiz">
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 2</div>
+                <div class="quiz-question">The two-hour rule means deli meat can be above 40°F for...</div>
+                <div class="quiz-options" id="quiz3">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours at a time, then recool it</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', true)">Two hours TOTAL, cumulatively, across the entire process</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours per day</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours, but recooling resets the clock</div>
+                </div>
+                <div class="quiz-feedback" id="quiz3-feedback"></div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 2</div>
+                <div class="quiz-question">Why can't you use a cooler to cool down warm sandwiches?</div>
+                <div class="quiz-options" id="quiz4">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz4', false)">You can — just add extra ice packs</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz4', false)">The ice packs will melt too fast</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz4', true)">Coolers only maintain temperature through insulation — they can't actively cool food</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz4', false)">It takes too long</div>
+                </div>
+                <div class="quiz-feedback" id="quiz4-feedback"></div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 2</div>
+                <div class="quiz-question">What temperature range should the TSP refrigerator maintain?</div>
+                <div class="quiz-options" id="quiz5">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz5', true)">34–38°F</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz5', false)">40–45°F</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz5', false)">32°F exactly</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz5', false)">Below 50°F</div>
+                </div>
+                <div class="quiz-feedback" id="quiz5-feedback"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                <button class="btn" onclick="nextSlide()">Continue to Operations →</button>
+            </div>
+        </div>
+
+        <!-- MODULE 3: OPERATIONS -->
+        <div class="slide-container" id="slide-3-1">
+            <div class="module-header">
+                <div class="module-number">Module 3 of 4</div>
+                <h2>Wednesday Protocol: Collection & Storage</h2>
+            </div>
+            <div class="content-card">
+                <h4>Set Up for Drop-offs</h4>
+                <ul>
+                    <li><strong>Donation Bin</strong> — Set up an area for fruit or healthy snacks</li>
+                    <li><strong>Sign-In Station</strong> — Place sign-in sheets, pens, and labels near drop-off</li>
+                </ul>
+
+                <h4>Volunteer Coordination</h4>
+                <table class="info-table">
+                    <tr>
+                        <th>Topic</th>
+                        <th>Guidance</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Timing</strong></td>
+                        <td>Volunteers should prepare sandwiches no earlier than <strong>Tuesday evening</strong> (preferably Wednesday)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transport</strong></td>
+                        <td>Remind volunteers to deliver in <strong>cooler bags with ice packs</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Labeling</strong></td>
+                        <td>Use official TSP labels — Deli must indicate meat type</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Newsletter</strong></td>
+                        <td>Encourage sign-up at thesandwichproject.org</td>
+                    </tr>
+                </table>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-3-2">
+            <div class="module-header">
+                <div class="module-number">Module 3 of 4</div>
+                <h2>Handling Quality Issues</h2>
+            </div>
+            <div class="content-card">
+                <p>When volunteers arrive, watch for these issues:</p>
+
+                <h4>🚫 Open or Torn Bags</h4>
+                <ul>
+                    <li>Do NOT repackage</li>
+                    <li>Politely refuse delivery, explaining TSP requires sealed packaging for safety</li>
+                    <li>If uncomfortable refusing: quarantine (mark "DO NOT USE - OPEN BAG") and contact your lead host immediately</li>
+                </ul>
+
+                <h4>🏷️ Missing or Incorrect Labels</h4>
+                <ul>
+                    <li>Ask volunteer to complete the TSP label on the spot</li>
+                    <li>Verify label shows Tuesday evening or Wednesday</li>
+                    <li>If they can't provide info, contact your lead host</li>
+                </ul>
+
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Warm, Moldy, or Spoiled Sandwiches</div>
+                    <p>These <strong>cannot be accepted</strong>. They represent significant food safety risks. Sandwiches should feel cool to the touch on arrival.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-3-3">
+            <div class="module-header">
+                <div class="module-number">Module 3 of 4</div>
+                <h2>If You Cannot Accept Sandwiches</h2>
+            </div>
+            <div class="content-card">
+                <p>You have options when something isn't right:</p>
+
+                <div class="do-dont-container">
+                    <div class="do-column" style="background: #e3f2fd; border-color: var(--teal);">
+                        <h4 style="color: var(--dark-teal);">Option A: Direct Refusal (Preferred)</h4>
+                        <p>If comfortable, kindly refuse delivery directly.</p>
+                        <p><strong>Suggested script:</strong> "I'm sorry, but for safety reasons, I can't accept these sandwiches. The Sandwich Project has strict quality and safety standards to protect our recipients."</p>
+                    </div>
+                    <div class="dont-column" style="background: #fff3e0; border-color: var(--orange);">
+                        <h4 style="color: #e65100;">Option B: The "Quarantine"</h4>
+                        <p>If uncomfortable refusing directly:</p>
+                        <ol>
+                            <li>Accept but isolate immediately</li>
+                            <li>Mark bags "DO NOT USE" with reason</li>
+                            <li>Contact lead host for disposal instructions</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="critical-warning">
+                    <div class="critical-warning-label">⚠️ Critical Reminders</div>
+                    <p><strong>Never place warm sandwiches into a cooler!</strong> Coolers maintain temperature — they don't cool things down.<br><br>
+                    <strong>No coolers in the trunk!</strong> Keep in the vehicle cabin where A/C circulates. Trunks can reach extreme temperatures.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-3-4">
+            <div class="module-header">
+                <div class="module-number">Module 3 of 4</div>
+                <h2>Thursday Protocol: Delivery & Transport</h2>
+            </div>
+            <div class="content-card">
+                <p>Thursday is delivery day. Proper packing ensures sandwiches remain safe.</p>
+
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content"><strong>Verify cold sandwiches</strong> — Only place sandwiches refrigerated/frozen for at least 15 minutes into a cooler</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content"><strong>Layer with ice packs</strong> — Place between packages and on top. All packages should contact an ice pack.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content"><strong>Pack cooler tightly</strong> — Full coolers resist warming better than partially filled ones</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content"><strong>Keep in vehicle cabin</strong> — Never the trunk. A/C helps maintain temperature.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content"><strong>Deliver promptly</strong> — Go straight to destination without delay</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-content"><strong>Refrigerate immediately</strong> — Transfer to refrigeration as soon as you arrive</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-3-5">
+            <div class="module-header">
+                <div class="module-number">Module 3 of 4</div>
+                <h2>Critical Transport Rules</h2>
+            </div>
+            <div class="content-card">
+                <div class="critical-warning" style="margin-top: 0;">
+                    <div class="critical-warning-label">⚠️ Non-Negotiable Rules</div>
+                    <p>These rules exist because breaking them makes food unsafe. No exceptions.</p>
+                </div>
+
+                <div class="steps-container" style="margin-top: 1.5rem;">
+                    <div class="step">
+                        <div class="step-number" style="background: var(--burgundy); color: white;">1</div>
+                        <div class="step-content"><strong>Never Pack a Hot Cooler</strong> — Coolers stored in hot conditions must cool completely before packing. A hot cooler will immediately warm sandwiches.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background: var(--burgundy); color: white;">2</div>
+                        <div class="step-content"><strong>Never Put Warm Sandwiches in a Cooler</strong> — Sandwiches must be refrigerator-cold (below 40°F) before going in. Non-negotiable.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background: var(--burgundy); color: white;">3</div>
+                        <div class="step-content"><strong>TSP Use Only</strong> — Don't use TSP coolers for raw meat, fish, or other non-TSP items to prevent cross-contamination.</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background: var(--burgundy); color: white;">4</div>
+                        <div class="step-content"><strong>No Packed Coolers Left in Vehicles</strong> — Coolers are for active transport only. Never leave them sitting in a parked car.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module 3 Quiz -->
+        <div class="slide-container" id="slide-3-quiz">
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 3</div>
+                <div class="quiz-question">Where should coolers be placed during transport?</div>
+                <div class="quiz-options" id="quiz6">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz6', false)">In the trunk where they're out of the way</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz6', true)">In the vehicle cabin where A/C circulates</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz6', false)">Either works fine</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz6', false)">On the roof rack with a cover</div>
+                </div>
+                <div class="quiz-feedback" id="quiz6-feedback"></div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="quiz-header">✓ Quick Check — Module 3</div>
+                <div class="quiz-question">A volunteer arrives with sandwiches in a torn bag. What should you do?</div>
+                <div class="quiz-options" id="quiz7">
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Transfer them to a new bag</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Accept them but use them first</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', true)">Politely refuse or quarantine and contact your lead host</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Tape the bag closed</div>
+                </div>
+                <div class="quiz-feedback" id="quiz7-feedback"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                <button class="btn" onclick="nextSlide()">Continue to Resources →</button>
+            </div>
+        </div>
+
+        <!-- MODULE 4: RESOURCES -->
+        <div class="slide-container" id="slide-4-1">
+            <div class="module-header">
+                <div class="module-number">Module 4 of 4</div>
+                <h2>Driver Guidelines</h2>
+            </div>
+            <div class="content-card">
+                <p>If you're delivering directly to recipient organizations, here are additional guidelines:</p>
+
+                <h4>Legal Requirements</h4>
+                <table class="info-table">
+                    <tr>
+                        <td><strong>Driver Agreement Form</strong></td>
+                        <td>All drivers must sign before first delivery. Contact Jordan (Driver Coordinator) at 770-789-7329 if you haven't received yours.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-Profits Only</strong></td>
+                        <td>We deliver exclusively to 501(c)(3) organizations. We cannot hand sandwiches directly to individuals.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consumption Timeline</strong></td>
+                        <td>Sandwiches must be consumed within 2 days of receipt. Verify this with recipient organizations.</td>
+                    </tr>
+                </table>
+
+                <h4>Feedback & Reporting — You're Our Eyes and Ears</h4>
+                <p>Report these issues immediately:</p>
+                <ul>
+                    <li><strong>Unsafe conditions</strong> — Any location that appears unclean</li>
+                    <li><strong>Improper storage</strong> — If recipients don't immediately refrigerate</li>
+                    <li><strong>Inadequate refrigeration</strong> — If they lack sufficient cooling capacity</li>
+                </ul>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Continue →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-container" id="slide-4-2">
+            <div class="module-header">
+                <div class="module-number">Module 4 of 4</div>
+                <h2>Contact Information</h2>
+            </div>
+            <div class="content-card">
+                <h4>When to Contact TSP Immediately</h4>
+                <ul>
+                    <li>🌡️ Sandwiches arrive warm</li>
+                    <li>📦 Bags are open or torn</li>
+                    <li>❄️ Not enough refrigerator space</li>
+                    <li>🚗 Pickups are delayed or unclear</li>
+                    <li>❓ Anything feels confusing or uncomfortable</li>
+                </ul>
+
+                <h4>Contact Information</h4>
+                <table class="info-table">
+                    <tr>
+                        <td><strong>Website</strong></td>
+                        <td>thesandwichproject.org</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email</strong></td>
+                        <td>info@thesandwichproject.org</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Driver Coordinator (Jordan)</strong></td>
+                        <td>770-789-7329</td>
+                    </tr>
+                </table>
+
+                <div class="info-box">
+                    <p><strong>Your Lead Host</strong> will be your first point of contact for most questions. You'll receive their contact information during onboarding.</p>
+                </div>
+
+                <div class="key-takeaway">
+                    <div class="key-takeaway-label">💡 Remember</div>
+                    <p>Katie will email you login credentials for the TSP Web App and provide onboarding support before your first collection day.</p>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+                    <button class="btn" onclick="nextSlide()">Finish Training →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Screen -->
+        <div class="completion-screen" id="completionScreen">
+            <div class="completion-icon">🎉</div>
+            <h2>Training Complete!</h2>
+            <p>You're ready to be an amazing TSP host. Thank you for joining our mission to nourish the hungry and feed the soul.</p>
+
+            <div class="completion-checklist">
+                <h4>Before Your First Wednesday</h4>
+                <ul>
+                    <li>Set up your collection area (bin, sign-in station, yard sign)</li>
+                    <li>Ensure your TSP refrigerator is clean and at 34-38°F</li>
+                    <li>Sign the Driver Agreement Form if you'll be driving</li>
+                    <li>Get your TSP Web App login from Katie</li>
+                    <li>Know your lead host's contact info</li>
+                </ul>
+            </div>
+
+            <p style="opacity: 0.8;">Questions? Reach out to your lead host or email info@thesandwichproject.org</p>
+
+            <button class="btn" onclick="restartTraining()" style="margin-top: 1rem;">Review Training Again</button>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav" id="sidebarNav">
+        <div class="nav-section">
+            <div class="nav-section-title">Module 1: Getting Started</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-1')">Welcome</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-2')">Your Role</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-3')">Requirements</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-4')">Responsibilities</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-5')">Collection Day</div>
+            <div class="nav-item" onclick="goToSlide('slide-1-quiz')">Quiz</div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 2: Food Safety</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-1')">Foundations</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-2')">Cold Chain</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-3')">Two-Hour Rule</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-4')">Refrigeration</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-5')">Coolers</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-6')">Labels</div>
+            <div class="nav-item" onclick="goToSlide('slide-2-quiz')">Quiz</div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 3: Operations</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-1')">Wednesday Protocol</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-2')">Quality Issues</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-3')">Refusing Sandwiches</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-4')">Thursday Protocol</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-5')">Transport Rules</div>
+            <div class="nav-item" onclick="goToSlide('slide-3-quiz')">Quiz</div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 4: Resources</div>
+            <div class="nav-item" onclick="goToSlide('slide-4-1')">Driver Guidelines</div>
+            <div class="nav-item" onclick="goToSlide('slide-4-2')">Contact Info</div>
+        </div>
+    </nav>
+
+    <script>
+        // Slide order
+        const slides = [
+            'slide-1-1', 'slide-1-2', 'slide-1-3', 'slide-1-4', 'slide-1-5', 'slide-1-quiz',
+            'slide-2-1', 'slide-2-2', 'slide-2-3', 'slide-2-4', 'slide-2-5', 'slide-2-6', 'slide-2-quiz',
+            'slide-3-1', 'slide-3-2', 'slide-3-3', 'slide-3-4', 'slide-3-5', 'slide-3-quiz',
+            'slide-4-1', 'slide-4-2'
+        ];
+
+        let currentSlideIndex = -1; // -1 = welcome screen
+
+        // Quiz correct answers
+        const correctAnswers = {
+            'quiz1': 'Politely refuse them — hosts do not accept warm sandwiches',
+            'quiz2': 'Wednesday (collection) and Thursday (delivery)',
+            'quiz3': 'Two hours TOTAL, cumulatively, across the entire process',
+            'quiz4': 'Coolers only maintain temperature through insulation — they can\'t actively cool food',
+            'quiz5': '34–38°F',
+            'quiz6': 'In the vehicle cabin where A/C circulates',
+            'quiz7': 'Politely refuse or quarantine and contact your lead host'
+        };
+
+        function updateProgress() {
+            const progress = currentSlideIndex < 0 ? 0 : ((currentSlideIndex + 1) / slides.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        }
+
+        function hideAllSlides() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('completionScreen').classList.remove('active');
+            slides.forEach(id => {
+                const slide = document.getElementById(id);
+                if (slide) slide.classList.remove('active');
+            });
+        }
+
+        function showSlide(slideId) {
+            hideAllSlides();
+            const slide = document.getElementById(slideId);
+            if (slide) {
+                slide.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+            updateProgress();
+            updateNavHighlight();
+        }
+
+        function startTraining() {
+            currentSlideIndex = 0;
+            showSlide(slides[0]);
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                showSlide(slides[currentSlideIndex]);
+            } else {
+                // Show completion screen
+                hideAllSlides();
+                document.getElementById('completionScreen').classList.add('active');
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('progressText').textContent = '100%';
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(slides[currentSlideIndex]);
+            }
+        }
+
+        function goToWelcome() {
+            currentSlideIndex = -1;
+            hideAllSlides();
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            updateProgress();
+        }
+
+        function goToSlide(slideId) {
+            const index = slides.indexOf(slideId);
+            if (index !== -1) {
+                currentSlideIndex = index;
+                showSlide(slideId);
+            }
+            // Close sidebar on mobile
+            document.getElementById('sidebarNav').classList.remove('open');
+        }
+
+        function restartTraining() {
+            currentSlideIndex = -1;
+            // Reset all quizzes
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+            });
+            document.querySelectorAll('.quiz-feedback').forEach(fb => {
+                fb.classList.remove('show');
+            });
+            goToWelcome();
+        }
+
+        function checkAnswer(element, quizId, isCorrect) {
+            const options = document.querySelectorAll(`#${quizId} .quiz-option`);
+            const feedback = document.getElementById(`${quizId}-feedback`);
+
+            // Disable all options
+            options.forEach(opt => {
+                opt.classList.add('disabled');
+                if (opt === element) {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+            });
+
+            // Find and highlight correct answer if wrong
+            if (!isCorrect) {
+                options.forEach(opt => {
+                    if (opt.textContent.trim() === correctAnswers[quizId]) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+
+            // Show feedback
+            feedback.classList.add('show');
+            if (isCorrect) {
+                feedback.classList.remove('incorrect');
+                feedback.classList.add('correct');
+                feedback.innerHTML = '✓ Correct!';
+            } else {
+                feedback.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedback.innerHTML = `Not quite — the answer is: <strong>${correctAnswers[quizId]}</strong>`;
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebarNav').classList.toggle('open');
+        }
+
+        function updateNavHighlight() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // This is simplified - in a full implementation you'd match the current slide
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
