@@ -1620,17 +1620,25 @@
                 <h2>Refrigeration: Temperature & Airflow</h2>
             </div>
             <div class="content-card">
-                <div class="highlight-box safe">
-                    <div class="big-text">34–38°F</div>
-                    <p>Target temperature range for your TSP refrigerator</p>
-                </div>
+                <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <div class="highlight-box safe" style="margin-top: 0;">
+                            <div class="big-text">34–38°F</div>
+                            <p>Target temperature range for your TSP refrigerator</p>
+                        </div>
 
-                <h4>Airflow Matters</h4>
-                <ul>
-                    <li>Food items must not be packed tightly</li>
-                    <li>Adequate airflow is essential for consistent cooling</li>
-                    <li><strong>Never overfill</strong> — Overfilled refrigerators create warm spots</li>
-                </ul>
+                        <h4>Airflow Matters</h4>
+                        <ul>
+                            <li>Food items must not be packed tightly</li>
+                            <li>Adequate airflow is essential for consistent cooling</li>
+                            <li><strong>Never overfill</strong> — Overfilled refrigerators create warm spots</li>
+                        </ul>
+                    </div>
+                    <div style="flex: 0 0 auto;">
+                        <img src="full%20fridge.png" alt="Well-organized TSP refrigerator with sandwich bags" style="max-width: 220px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                        <p style="font-size: 0.85rem; color: #666; text-align: center; margin-top: 0.5rem;">A well-stocked host fridge</p>
+                    </div>
+                </div>
 
                 <div class="nav-buttons">
                     <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
@@ -1896,16 +1904,26 @@
                 <h2>Issue: Open or Torn Bags</h2>
             </div>
             <div class="content-card">
-                <div class="critical-warning" style="margin-top: 0;">
-                    <div class="critical-warning-label">🚫 Do NOT Repackage</div>
-                    <p>Open or torn bags cannot be accepted or fixed.</p>
+                <h4 style="margin-top: 0;">🔍 Assess the Situation</h4>
+                <p>Is it just the <strong>outer bag</strong> that's torn, or are the <strong>sandwiches themselves</strong> compromised?</p>
+
+                <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
+                    <strong>✅ Outer Bag Torn Only:</strong>
+                    <ul style="margin: 0.5rem 0 0 0;">
+                        <li>Transfer sandwiches to a new bag</li>
+                        <li>Ensure sandwiches themselves are still properly sealed and intact</li>
+                        <li>Accept and refrigerate as normal</li>
+                    </ul>
                 </div>
 
-                <h4>What To Do</h4>
-                <ul>
-                    <li>Politely refuse delivery, explaining TSP requires sealed packaging for safety</li>
-                    <li>If uncomfortable refusing: quarantine (mark "DO NOT USE - OPEN BAG") and contact your lead host immediately</li>
-                </ul>
+                <div class="critical-warning">
+                    <div class="critical-warning-label">🚫 Sandwich Packaging Compromised</div>
+                    <p>If the sandwich wrapping itself is open, torn, or you have any concerns:</p>
+                    <ul style="margin: 0.5rem 0 0 0;">
+                        <li>Do NOT accept those sandwiches</li>
+                        <li>Contact your lead host for guidance</li>
+                    </ul>
+                </div>
 
                 <div class="nav-buttons">
                     <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
@@ -2105,11 +2123,11 @@
 
             <div class="quiz-section">
                 <div class="quiz-header">✓ Quick Check</div>
-                <div class="quiz-question">A volunteer arrives with sandwiches in a torn bag. What should you do?</div>
+                <div class="quiz-question">A volunteer arrives with sandwiches in a torn outer bag, but the sandwiches themselves are still sealed. What should you do?</div>
                 <div class="quiz-options" id="quiz7">
-                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Transfer them to a new bag</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', true)">Transfer them to a new bag and accept</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Refuse the entire delivery</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Accept them but use them first</div>
-                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', true)">Politely refuse or quarantine and contact your lead host</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz7', false)">Tape the bag closed</div>
                 </div>
                 <div class="quiz-feedback" id="quiz7-feedback"></div>
@@ -2487,7 +2505,7 @@
             'quiz4': 'Coolers only maintain temperature — they can\'t actively cool food',
             'quiz5': '34–38°F',
             'quiz6': 'In the vehicle cabin where A/C circulates',
-            'quiz7': 'Politely refuse or quarantine and contact your lead host'
+            'quiz7': 'Transfer them to a new bag and accept'
         };
 
         function updateProgress() {
