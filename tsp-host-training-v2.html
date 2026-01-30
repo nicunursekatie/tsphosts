@@ -1173,13 +1173,13 @@
                         <div class="check-box"></div>
                         <span class="check-label">A designated bin or area for fruit/snacks</span>
                     </li>
-                    <li onclick="toggleCheck(this)" data-item="Get TSP yard sign">
+                    <li onclick="toggleCheck(this)" data-item="Receive TSP yard sign from your coordinator">
                         <div class="check-box"></div>
-                        <span class="check-label">A TSP yard sign</span>
+                        <span class="check-label">A TSP yard sign <span style="color: #666; font-size: 0.9em;">(provided by TSP)</span></span>
                     </li>
-                    <li onclick="toggleCheck(this)" data-item="Print sign-in sheets and sandwich labels">
+                    <li onclick="toggleCheck(this)" data-item="Get more labels from the TSP app when needed">
                         <div class="check-box"></div>
-                        <span class="check-label">Sign-in sheets and sandwich labels</span>
+                        <span class="check-label">Sign-in sheets and sandwich labels <span style="color: #666; font-size: 0.9em;">(starter set provided — print more from the TSP app)</span></span>
                     </li>
                     <li onclick="toggleCheck(this)" data-item="Get a small table or clipboard for sign-in station">
                         <div class="check-box"></div>
@@ -2396,7 +2396,8 @@
         const chainSteps = [
             {
                 title: "🏪 Grocery Store",
-                text: "The cold chain starts here. Deli meat and cheese are kept refrigerated at the store. The moment a volunteer picks them up, the clock starts ticking."
+                text: "The cold chain starts here. Deli meat and cheese are kept refrigerated at the store. The moment a volunteer picks them up, the clock starts ticking.",
+                image: "deli%20meat%20aisle.jpg"
             },
             {
                 title: "🧊 Transport Home",
@@ -2454,7 +2455,9 @@
 
             // Update explanation
             if (chainStep < chainSteps.length) {
-                explanation.innerHTML = `<h4>${chainSteps[chainStep].title}</h4><p>${chainSteps[chainStep].text}</p>`;
+                const step = chainSteps[chainStep];
+                const imageHtml = step.image ? `<img src="${step.image}" alt="${step.title}" style="max-width: 180px; border-radius: 6px; float: right; margin-left: 1rem; margin-bottom: 0.5rem;">` : '';
+                explanation.innerHTML = `${imageHtml}<h4>${step.title}</h4><p>${step.text}</p>`;
                 explanation.style.display = 'block';
                 complete.style.display = 'none';
                 chainNav.style.display = 'flex';
