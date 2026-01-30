@@ -1232,16 +1232,16 @@
                 <h2>Requirement: Your Schedule</h2>
             </div>
             <div class="content-card">
-                <p>Hosts need to be available on two specific days each week:</p>
+                <p>The weekly hosting rhythm happens across two days — but we're not asking for two full days!</p>
 
                 <div class="temp-display">
                     <div class="temp-card safe">
                         <div class="temp-value" style="font-size: 1.5rem;">📥</div>
-                        <div class="temp-label"><strong>Wednesday</strong><br>Collection Day<br>Volunteers drop off sandwiches</div>
+                        <div class="temp-label"><strong>Wednesday</strong><br>Collection Day<br>Volunteers drop off sandwiches<br><span style="font-size: 0.85rem; color: #666;">(collection area just needs to be accessible)</span></div>
                     </div>
                     <div class="temp-card" style="background: #fff3e0; border: 2px solid var(--orange);">
                         <div class="temp-value" style="font-size: 1.5rem;">🚗</div>
-                        <div class="temp-label"><strong>Thursday</strong><br>Delivery Day<br>You drive donations to recipients</div>
+                        <div class="temp-label"><strong>Thursday Morning</strong><br>Delivery Day<br>You drive donations to recipients<br><span style="font-size: 0.85rem; color: #666;">(typically a few hours in the AM)</span></div>
                     </div>
                 </div>
 
@@ -1819,7 +1819,7 @@
                 <div class="quiz-question">The two-hour rule means deli meat can be above 40°F for...</div>
                 <div class="quiz-options" id="quiz3">
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours at a time, then recool it</div>
-                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', true)">Two hours TOTAL, cumulatively, across the entire process</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', true)">Two hours TOTAL — the clock never resets</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours per day</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz3', false)">Two hours, but recooling resets the clock</div>
                 </div>
@@ -1907,9 +1907,9 @@
                 <h4 style="margin-top: 0;">🔍 Assess the Situation</h4>
                 <p>Is it just the <strong>outer bag</strong> that's torn, or are the <strong>sandwiches themselves</strong> compromised?</p>
 
-                <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
-                    <strong>✅ Outer Bag Torn Only:</strong>
-                    <ul style="margin: 0.5rem 0 0 0;">
+                <div class="info-box" style="background: #e0f7fa; border-left-color: var(--teal);">
+                    <strong style="color: var(--dark-teal);">✅ Outer Bag Torn Only:</strong>
+                    <ul style="margin: 0.5rem 0 0 0; color: #333;">
                         <li>Transfer sandwiches to a new bag</li>
                         <li>Ensure sandwiches themselves are still properly sealed and intact</li>
                         <li>Accept and refrigerate as normal</li>
@@ -2501,7 +2501,7 @@
         const correctAnswers = {
             'quiz1': 'Politely refuse them — hosts do not accept warm sandwiches',
             'quiz2': 'Wednesday (collection) and Thursday (delivery)',
-            'quiz3': 'Two hours TOTAL, cumulatively, across the entire process',
+            'quiz3': 'Two hours TOTAL — the clock never resets',
             'quiz4': 'Coolers only maintain temperature — they can\'t actively cool food',
             'quiz5': '34–38°F',
             'quiz6': 'In the vehicle cabin where A/C circulates',
