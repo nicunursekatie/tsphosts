@@ -1383,7 +1383,7 @@
                 <div class="quiz-question">On which days do hosts need to be available?</div>
                 <div class="quiz-options" id="quiz2">
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Monday and Tuesday</div>
-                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', true)">Wednesday (collection) and Thursday (delivery)</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', true)">Wednesday (collection) and Thursday morning (delivery)</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Any two days that work for your schedule</div>
                     <div class="quiz-option" onclick="checkAnswer(this, 'quiz2', false)">Friday and Saturday</div>
                 </div>
@@ -1412,11 +1412,6 @@
                     <li>People with chronic health conditions or weakened immune systems</li>
                     <li>Many may not have health insurance or easy access to healthcare</li>
                 </ul>
-
-                <div class="critical-warning">
-                    <div class="critical-warning-label">⚠️ Critical</div>
-                    <p>Food safety depends on strict consistency at every step. There are no shortcuts.</p>
-                </div>
 
                 <div class="nav-buttons">
                     <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
@@ -2401,7 +2396,8 @@
             },
             {
                 title: "🧊 Transport Home",
-                text: "Volunteers should use a cooler with ice packs to get ingredients home. This keeps food cold and protects that precious two-hour window."
+                text: "Volunteers should use a cooler with ice packs to get ingredients home. This keeps food cold and protects that precious two-hour window.",
+                image: "cooler%20after%20shopping.png"
             },
             {
                 title: "🥪 Sandwich Assembly",
@@ -2506,7 +2502,7 @@
         // Quiz correct answers
         const correctAnswers = {
             'quiz1': 'Politely refuse them — hosts do not accept warm sandwiches',
-            'quiz2': 'Wednesday (collection) and Thursday (delivery)',
+            'quiz2': 'Wednesday (collection) and Thursday morning (delivery)',
             'quiz3': 'Two hours TOTAL — the clock never resets',
             'quiz4': 'Coolers only maintain temperature — they can\'t actively cool food',
             'quiz5': '34–38°F',
